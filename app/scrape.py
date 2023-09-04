@@ -1,7 +1,14 @@
 import csv
 import json
+import os
+from dotenv import load_dotenv
 
-# https://api.sportsdata.io/v3/nfl/projections/json/PlayerGameProjectionStatsByWeek/2019REG/1?key=517b12cf76dc49d0a14d0a15b2b64ead
+load_dotenv(".env")
+url = os.getenv("URL_SECRET")
+api_key = os.getenv("KEY_SECRET")
+
+data_type= "2019REG/1?key="
+
 with open('1_2019(1).json', 'r') as jsonfile:
     data = json.load(jsonfile)
 fieldnames = data[0].keys()
