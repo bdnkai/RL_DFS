@@ -1,15 +1,17 @@
 import os
-import sys
-from dotenv import load_dotenv as ld_dot
-
-sys.path.append('/x/personal_project/bdn_portfolio/rl_dfs/')
+from dotenv import load_dotenv as ld_env
 
 
-ld_dot('../../.env')
-def get_env(variable):
-    return os.getenv(variable)
+def secrets(path_to_env):
+    ld_env(path_to_env)
 
+    entry_point = os.getenv("SECRET_PATH")
+    data_point_one = os.getenv("SECRET_A")
+    data_point_two = os.getenv("SECRET_B")
+    data_pont_three = os.getenv("SECRET_C")
+    data_pont_four = os.getenv("SECRET_D")
+    access_point = os.getenv("SECRET_KEY")
 
-dot_var = url, login_url, spider_script
+    secret_vars = entry_point, data_point_one, data_point_two, data_pont_three, data_pont_four, access_point
 
-print(dot_var)
+    return secret_vars
