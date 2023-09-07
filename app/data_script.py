@@ -7,7 +7,7 @@ from modules.dot_export import secrets
 
 # What does env_path do?
 # What does secret_var do?
-# what method is line 26 using?
+# what method is line 23 using?
 # why am I using filename_mapping?
 # give me a brief summary of each function, (exmaple fuinction - brief summary)
 # why do I have 2 urls in data_request function?
