@@ -5,9 +5,21 @@ import concurrent.futures
 import time
 from modules.dot_export import secrets
 
-#
+# What does env_path do?
+# What does secret_var do?
+# what method is line 26 using?
+# why am I using filename_mapping?
+# give me a brief summary of each function, (exmaple fuinction - brief summary)
+# why do I have 2 urls in data_request function?
+# am I using try and except methods? if so why?
+
+# line 90 is a bonus, explain to me what you think that does.
+
+
 env_path = os.path.abspath("../.env")
+
 secret_var = secrets(env_path)
+
 projected_player_pts, actual_player_pts, team_performance, odds, entry, access = secret_var
 
 filename_mapping = {
@@ -20,10 +32,10 @@ filename_mapping = {
 def get_filename(endpoint):
     return filename_mapping.get(endpoint, "default_filename")
 
-def data_requests(target_type, target_season, target_week):
-    # declaring url w/ args for versatile api calls
-    # url = f'https://filesamples.com/samples/code/json/sample1.json'
 
+def data_requests(target_type, target_season, target_week):
+
+    # url = f'https://filesamples.com/samples/code/json/sample1.json'
     url = f'{entry}/{target_type}/{target_season}REG/{target_week}?key={access}'
     print(f'  ||  YEAR:{target_season}  ||  WEEK:{target_week} || TARGET: {target_type}  ||')
 
