@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv as ld_env
 
-
 def secrets(path_to_env):
     ld_env(path_to_env)
 
