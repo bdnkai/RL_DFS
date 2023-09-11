@@ -36,15 +36,14 @@ def dispatch_converter(raw_data, json_file_path, csv_file_path):
 
 def dispatch_cleaner(raw_data, target_type, target_season, target_week):
     match raw_data:
-        case 'empty_cells':
+        case 'step_one':
 
-            print(target_type)
             print(f' {target_season} | {target_week} | {target_type} ')
             tag_name = f'{target_season}_week-{target_week}__{target_type}'
             print(tag_name)
 
-            csv_file_path = f'../data_csv/{tag_name}.csv'
-            post_process_path = f'../data_RL/{tag_name}.csv'
+            csv_file_path = f'data_csv/{tag_name}.csv'
+            post_process_path = f'data_RL/{tag_name}.csv'
 
             print(post_process_path)
 
@@ -63,18 +62,18 @@ def dispatch_cleaner(raw_data, target_type, target_season, target_week):
                 cleaned_v1.to_csv(post_process_path, index=False)
                 cleaned_csv_path, len(columns_to_remove)
 
-            if target_type == "Player_Projection":
-                dispatch_cleaner("player_projection", target_type=target_type, target_season=target_season, target_week=target_week)
+                dispatch_cleaner("step_two", cleaned_csv_path, target_season, target_week)
+                return
 
-        case 'player_projection':
+        case 'step_two':
 
             print(f' {target_season} | {target_week} | {target_type} ')
             tag_name = f'{target_season}_week-{target_week}__{target_type}'
             print(tag_name)
 
-            csv_file_path = f'../data_csv/{tag_name}.csv'
+            csv_file_path = f'data_RL/{tag_name}.csv'
 
-            post_process_path = f'../data_RL/{tag_name}.csv'
+            post_process_path = f'data_finalize/{tag_name}.csv'
 
             clean_file_csv = pd.read_csv(csv_file_path)
 
@@ -92,14 +91,56 @@ def dispatch_cleaner(raw_data, target_type, target_season, target_week):
             cleaned_v2.to_csv(post_process_path, index=False)
 
             return
-        case 'Player_Actual_Stats':
-            raw_csv_path = csv_file_path
-            raw_json_path = json_file_path
+        case 'Final_Merge':
+
+            import os
+            csv_file_path = f'data_csv/'
+
+            post_process_path = f'data_finalize/'
+
+            def clean_and_preprocess(player_actual_df, player_projection_df, team_stats_df, game_odds_df):
+                # Remove columns with 'Scrambled' in their names
+                player_actual_df = player_actual_df.loc[:, ~player_actual_df.columns.str.contains('Scrambled')]
+                player_projection_df = player_projection_df.loc[:,
+                                       ~player_projection_df.columns.str.contains('Scrambled')]
+                team_stats_df = team_stats_df.loc[:, ~team_stats_df.columns.str.contains('Scrambled')]
+                game_odds_df = game_odds_df.loc[:, ~game_odds_df.columns.str.contains('Scrambled')]
+
+                # Remove duplicate or unnecessary columns (e.g., absolute and Proj values)
+                # Add your specific column names to drop here
+                columns_to_drop = ['ColumnName1', 'ColumnName2']
+                player_actual_df.drop(columns_to_drop, axis=1, inplace=True)
+                player_projection_df.drop(columns_to_drop, axis=1, inplace=True)
+
+                # Your additional cleaning code here (e.g., handle missing values, etc.)
+
+                # Calculate average odds
+                average_odds_df = game_odds_df.groupby(['HomeTeamName', 'AwayTeamName', 'Week', 'Season']).agg(
+                    {'Spread': 'mean', 'OverUnder': 'mean'}).reset_index()
+
+                # Merge with Player_Actual
+                merged_with_actual = pd.merge(player_actual_df, average_odds_df,
+                                              left_on=['Team', 'Opponent', 'Week', 'Season'],
+                                              right_on=['HomeTeamName', 'AwayTeamName', 'Week', 'Season'],
+                                              how='left',
+                                              suffixes=('', '_odds'))
+
+                # Merge with Player_Projection
+                final_merged_df = pd.merge(merged_with_actual, player_projection_df,
+                                           on=['PlayerID', 'Season', 'Week', 'Team', 'Opponent'],
+                                           how='left',
+                                           suffixes=('_actual', '_proj'))
+
+                return final_merged_df
+
+            print(f' {target_season} | {target_week} | {target_type} ')
+
+            tag_name = f'{target_season}_week-{target_week}__Final_Merger'
+
+            print(tag_name)
 
             return
         case 'Team_Stats':
-            raw_csv_path = csv_file_path
-            raw_json_path = json_file_path
 
 
             return
